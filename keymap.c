@@ -23,7 +23,7 @@ enum layers {
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-/* 
+/*
  * Base Layer: QWERTY
  *
  * ,-------------------------------------------.                              ,-------------------------------------------.
@@ -78,9 +78,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *                        `----------------------------------'  `----------------------------------'
  */
     [_RAISE] = LAYOUT(
-      _______, _______,    KC_7,    KC_8,    KC_9, _______,                                     _______,  KC_7,    KC_8,    KC_9, _______, _______,
-      _______,    KC_0,    KC_4,    KC_5,    KC_6, _______,                                     _______,  KC_4,    KC_5,    KC_6,    KC_0, _______,
-      _______,    KC_0,    KC_1,    KC_2,    KC_3, _______,  KC_MS_U, KC_MS_L, KC_MS_R, KC_MS_D,_______,  KC_1,    KC_2,    KC_3,    KC_0, _______,
+      _______, _______,    KC_7,    KC_8,    KC_9, KC_DEL,                                     _______,  KC_7,    KC_8,    KC_9, _______, _______,
+      _______,    KC_0,    KC_4,    KC_5,    KC_6, KC_BSPC,                                     _______,  KC_4,    KC_5,    KC_6,    KC_0, _______,
+      _______,    KC_0,    KC_1,    KC_2,    KC_3, KC_DOT,   KC_MS_U, KC_MS_L, KC_MS_R, KC_MS_D,_______,  KC_1,    KC_2,    KC_3,    KC_0, _______,
                                  _______, _______, _______, _______, _______, _______, _______, _______,  _______, _______
     ),
 /*
@@ -135,7 +135,10 @@ oled_rotation_t oled_init_user(oled_rotation_t rotation) {
 }
 
 static void render_status(void) {
-    oled_write_P(PSTR("Cparsons rev1.6\n\n"), false);
+    oled_write_P(PSTR("Cparsons rev1.7\n"), false);
+#ifdef ENCODER_ENABLE
+    oled_write_P(PSTR("Encoder on\n\n"), false);
+#endif
 
     // Host Keyboard Layer Status
     oled_write_P(PSTR("Layer: "), false);
@@ -172,26 +175,35 @@ void oled_task_user(void) {
 
 #ifdef ENCODER_ENABLE
 void encoder_update_user(uint8_t index, bool clockwise) {
-   switch (index)
-   {
-      default:
-        // Page up/Page down
-        if (clockwise) {
-           tap_code(KC_UP);
-           tap_code(KC_UP);
-           tap_code(KC_UP);
-           tap_code(KC_UP);
-           tap_code(KC_UP);
-           tap_code(KC_UP);
-        } else {
-            tap_code(KC_DOWN);
-            tap_code(KC_DOWN);
-            tap_code(KC_DOWN);
-            tap_code(KC_DOWN);
-            tap_code(KC_DOWN);
-            tap_code(KC_DOWN);
+    if (index == 0) {
+        switch(biton32(layer_state)){
+            case 1:
+                if (clockwise){
+                    tap_code(KC_LEFT);
+                } else{
+                    tap_code(KC_RGHT);
+                }
+                break;
+
+              default:
+                // Page up/Page down
+                if (clockwise) {
+                   tap_code(KC_UP);
+                   tap_code(KC_UP);
+                   tap_code(KC_UP);
+                   tap_code(KC_UP);
+                   tap_code(KC_UP);
+                   tap_code(KC_UP);
+                } else {
+                    tap_code(KC_DOWN);
+                    tap_code(KC_DOWN);
+                    tap_code(KC_DOWN);
+                    tap_code(KC_DOWN);
+                    tap_code(KC_DOWN);
+                    tap_code(KC_DOWN);
+                }
+                break;
         }
-        break;
     }
 }
 #endif
