@@ -41,7 +41,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
       LT(KC_RALT, KC_ESC),     KC_Q,   KC_W,   KC_E,   KC_R,   KC_T,                                         KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_PIPE,
       KC_LCTL,                 KC_A,   KC_S,   KC_D,   KC_F,   KC_G,                                         KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,
       KC_LSFT,                 KC_Z,   KC_X,   KC_C,   KC_V,   KC_B,   KC_UP,   KC_LEFT, KC_RGHT, KC_DOWN,  KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_MINS,
-              KC_LGUI, KC_DEL, MT(MOD_LALT, KC_ENT), LT(_LOWER, KC_SPC), LT(_RAISE, KC_ESC), LT(_LOWER, KC_ENT), LT(_RAISE, KC_SPC), KC_TAB,  KC_BSPC, _______
+     KC_LGUI, KC_DEL, MT(MOD_LALT, KC_ENT), LT(_LOWER, KC_SPC), LT(_RAISE, KC_ESC), LT(_LOWER, KC_ENT), LT(_RAISE, KC_SPC), KC_TAB,  KC_BSPC, LGUI(LCTL(KC_Q))
     ),
 /*
  * Lower Layer: Symbols
@@ -61,7 +61,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
       _______, KC_EXLM, KC_AT,   KC_LCBR, KC_RCBR, KC_PIPE,                                    KC_INSERT, KC_PAUSE, KC_PSCREEN, _______,  _______, KC_BSLS,
       _______, KC_HASH, KC_DLR,  KC_LPRN, KC_RPRN, KC_GRV,                                     KC_PLUS, KC_MINS, KC_SLSH, KC_ASTR, KC_PERC, KC_QUOT,
       _______, KC_PERC, KC_CIRC, KC_LBRC, KC_RBRC, KC_TILD, KC_PGUP, KC_HOME, KC_END, KC_PGDN, KC_AMPR, KC_EQL,  KC_COMM, KC_DOT,  KC_SLSH, KC_MINS,
-                                 _______, _______, _______, KC_SCLN, KC_EQL,  KC_EQL, KC_SCLN, _______, _______, _______
+                                 _______, _______, _______, KC_SCLN, KC_EQL,  KC_EQL, KC_SCLN, _______, _______, KC_MNXT
     ),
 /*
  * Raise Layer: Number keys, media, navigation
@@ -81,7 +81,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
       _______, _______,    KC_7,    KC_8,    KC_9, KC_DEL,                                     _______,  KC_7,    KC_8,    KC_9, _______, _______,
       _______,    KC_0,    KC_4,    KC_5,    KC_6, KC_BSPC,                                     _______,  KC_4,    KC_5,    KC_6,    KC_0, _______,
       _______,    KC_0,    KC_1,    KC_2,    KC_3, KC_DOT,   KC_MS_U, KC_MS_L, KC_MS_R, KC_MS_D,_______,  KC_1,    KC_2,    KC_3,    KC_0, _______,
-                                 _______, _______, _______, _______, _______, _______, _______, _______,  _______, _______
+                                 _______, _______, _______, _______, _______, _______, _______, _______,  _______, KC_MPLY
     ),
 /*
  * Adjust Layer: Function keys, RGB
@@ -135,10 +135,7 @@ oled_rotation_t oled_init_user(oled_rotation_t rotation) {
 }
 
 static void render_status(void) {
-    oled_write_P(PSTR("Cparsons rev1.7\n"), false);
-#ifdef ENCODER_ENABLE
-    oled_write_P(PSTR("Encoder on\n\n"), false);
-#endif
+    oled_write_P(PSTR("Cparsons rev1.10\n"), false);
 
     // Host Keyboard Layer Status
     oled_write_P(PSTR("Layer: "), false);
@@ -175,32 +172,36 @@ void oled_task_user(void) {
 
 #ifdef ENCODER_ENABLE
 void encoder_update_user(uint8_t index, bool clockwise) {
-    if (index == 0) {
+    if (index == 1) {
         switch(biton32(layer_state)){
+            case 2:
+                if (clockwise){
+                    tap_code(KC_VOLD);
+                } else{
+                    tap_code(KC_VOLU);
+                }
+                break;
+
             case 1:
                 if (clockwise){
-                    tap_code(KC_LEFT);
+                    tap_code(KC_SCLN);
+                    tap_code(KC_C);
+                    tap_code(KC_N);
+                    tap_code(KC_ENTER);
                 } else{
-                    tap_code(KC_RGHT);
+                    tap_code(KC_SCLN);
+                    tap_code(KC_C);
+                    tap_code(KC_P);
+                    tap_code(KC_ENTER);
                 }
                 break;
 
               default:
                 // Page up/Page down
                 if (clockwise) {
-                   tap_code(KC_UP);
-                   tap_code(KC_UP);
-                   tap_code(KC_UP);
-                   tap_code(KC_UP);
-                   tap_code(KC_UP);
-                   tap_code(KC_UP);
+                   tap_code(KC_PGUP);
                 } else {
-                    tap_code(KC_DOWN);
-                    tap_code(KC_DOWN);
-                    tap_code(KC_DOWN);
-                    tap_code(KC_DOWN);
-                    tap_code(KC_DOWN);
-                    tap_code(KC_DOWN);
+                   tap_code(KC_PGDN);
                 }
                 break;
         }
