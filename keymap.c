@@ -135,7 +135,7 @@ oled_rotation_t oled_init_user(oled_rotation_t rotation) {
 }
 
 static void render_status(void) {
-    oled_write_P(PSTR("Cparsons rev1.10\n"), false);
+    oled_write_P(PSTR("Cparsons rev1.11\n"), false);
 
     // Host Keyboard Layer Status
     oled_write_P(PSTR("Layer: "), false);
@@ -184,12 +184,12 @@ void encoder_update_user(uint8_t index, bool clockwise) {
 
             case 1:
                 if (clockwise){
-                    tap_code(KC_SCLN);
+                    tap_code16(S(KC_SCLN));
                     tap_code(KC_C);
                     tap_code(KC_N);
                     tap_code(KC_ENTER);
                 } else{
-                    tap_code(KC_SCLN);
+                    tap_code16(S(KC_SCLN));
                     tap_code(KC_C);
                     tap_code(KC_P);
                     tap_code(KC_ENTER);
