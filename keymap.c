@@ -22,6 +22,13 @@ enum layers {
     _ADJUST
 };
 
+enum custom_keycodes {
+    CB = SAFE_RANGE,
+    DND15, /* Slack "Do not disturb 25 mins" */
+    DND30,
+    DND60,
+
+};
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /*
  * Base Layer: QWERTY
@@ -78,9 +85,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *                        `----------------------------------'  `----------------------------------'
  */
     [_RAISE] = LAYOUT(
-      _______, _______,    KC_7,    KC_8,    KC_9, KC_DEL,                                     _______,  KC_7,    KC_8,    KC_9, _______, _______,
-      _______,    KC_0,    KC_4,    KC_5,    KC_6, KC_BSPC,                                     _______,  KC_4,    KC_5,    KC_6,    KC_0, _______,
-      _______,    KC_0,    KC_1,    KC_2,    KC_3, KC_DOT,   KC_MS_U, KC_MS_L, KC_MS_R, KC_MS_D,_______,  KC_1,    KC_2,    KC_3,    KC_0, _______,
+      DND15,    CB,    KC_7,    KC_8,    KC_9, KC_DEL,                                     _______,  KC_7,    KC_8,    KC_9, _______, _______,
+      DND30,    KC_0,    KC_4,    KC_5,    KC_6, KC_BSPC,                                     _______,  KC_4,    KC_5,    KC_6,    KC_0, _______,
+      DND60,    KC_0,    KC_1,    KC_2,    KC_3, KC_DOT,   KC_MS_U, KC_MS_L, KC_MS_R, KC_MS_D,_______,  KC_1,    KC_2,    KC_3,    KC_0, _______,
                                  _______, _______, _______, _______, _______, _______, _______, _______,  _______, KC_MPLY
     ),
 /*
@@ -135,7 +142,7 @@ oled_rotation_t oled_init_user(oled_rotation_t rotation) {
 }
 
 static void render_status(void) {
-    oled_write_P(PSTR("Cparsons rev1.11\n"), false);
+    oled_write_P(PSTR("Cparsons rev1.13\n"), false);
 
     // Host Keyboard Layer Status
     oled_write_P(PSTR("Layer: "), false);
@@ -208,3 +215,34 @@ void encoder_update_user(uint8_t index, bool clockwise) {
     }
 }
 #endif
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case DND15:
+            if (record->event.pressed) {
+                SEND_STRING("/dnd 15 minutes");
+            } else {
+            }
+            break;
+
+        case DND30:
+            if (record->event.pressed) {
+                SEND_STRING("/dnd 30 minutes");
+            } else {
+            }
+            break;
+        case DND60:
+            if (record->event.pressed) {
+                SEND_STRING("/dnd 60 minutes");
+            } else {
+            }
+            break;
+        case CB:
+            if (record->event.pressed) {
+                SEND_STRING("Casablanca");
+            } else {
+            }
+            break;
+    }
+    return true;
+}
