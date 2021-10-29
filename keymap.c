@@ -142,7 +142,7 @@ oled_rotation_t oled_init_user(oled_rotation_t rotation) {
 }
 
 static void render_status(void) {
-    oled_write_P(PSTR("Cparsons rev1.14\n"), false);
+    oled_write_P(PSTR("Cparsons rev1.15\n"), false);
 
     // Host Keyboard Layer Status
     oled_write_P(PSTR("Layer: "), false);
@@ -181,7 +181,7 @@ void oled_task_user(void) {
 void encoder_update_user(uint8_t index, bool clockwise) {
     if (index == 1) {
         switch(biton32(layer_state)){
-            case 3:
+            case _ADJUST:
                 if (clockwise){
                     tap_code(KC_MNXT);
                 } else{
@@ -189,7 +189,7 @@ void encoder_update_user(uint8_t index, bool clockwise) {
                 }
                 break;
 
-            case 2:
+            case _RAISE:
                 if (clockwise){
                     tap_code(KC_VOLD);
                 } else{
@@ -197,7 +197,7 @@ void encoder_update_user(uint8_t index, bool clockwise) {
                 }
                 break;
 
-            case 1:
+            case _LOWER:
                 if (clockwise){
                     tap_code16(S(KC_SCLN));
                     tap_code(KC_C);
