@@ -23,11 +23,11 @@ enum layers {
     _ADJUST
 };
 
-enum custom_keycodes {
+// enum custom_keycodes {
     // DND15 = SAFE_RANGE,, /* Slack "Do not disturb 25 mins" */
     // DND30,
     // DND60,
-};
+// };
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /*
  * Base Layer: QWERTY

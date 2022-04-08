@@ -39,3 +39,5 @@
 #define PIMORONI_TRACKBALL_CLICK 
 #define MASTER_RIGHT
 #define HOLD_ON_OTHER_KEY_PRESS
+#define PERMISSIVE_HOLD_PER_KEY
+>>>>>>> 0f112a4 (Hold on keypress)
