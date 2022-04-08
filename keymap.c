@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include QMK_KEYBOARD_H
+#include "drivers/sensors/pimoroni_trackball.h"
 
 enum layers {
     _QWERTY = 0,
@@ -140,7 +141,7 @@ oled_rotation_t oled_init_user(oled_rotation_t rotation) {
 }
 
 static void render_status(void) {
-    oled_write_P(PSTR("Cparsons rev1.17\n"), false);
+    oled_write_P(PSTR("Cparsons rev1.15\n"), false);
 
     // Host Keyboard Layer Status
     oled_write_P(PSTR("Layer: "), false);
@@ -168,6 +169,10 @@ static void render_status(void) {
     oled_write_P(IS_LED_ON(led_usb_state, USB_LED_SCROLL_LOCK) ? PSTR("SCRLCK ") : PSTR("       "), false);
 }
 
+void keyboard_post_init_user(void) {
+     trackball_set_rgbw(255,0,0,128);
+}
+
 void oled_task_user(void) {
     if (is_keyboard_master()) {
         render_status(); // Renders the current keyboard state (layer, lock, caps, scroll, etc)
@@ -176,22 +181,15 @@ void oled_task_user(void) {
 #endif
 
 #ifdef ENCODER_ENABLE
-void encoder_update_user(uint8_t index, bool clockwise) {
+bool encoder_update_user(uint8_t index, bool clockwise) {
+
     if (index == 1) {
         switch(biton32(layer_state)){
             case _ADJUST:
                 if (clockwise){
-                    tap_code16(C(KC_A));
-                    // was slow
-                    //send_string(":resize-p -D 5");
-                    //tap_code(KC_ENTER);
-                    tap_code16(S(KC_J));
+                    tap_code(KC_MNXT);
                 } else{
-                    tap_code16(C(KC_A));
-                    /* was slow */
-                    /* send_string(":resize-p -U 5"); */
-                    /* tap_code(KC_ENTER); */
-                    tap_code16(S(KC_K));
+                    tap_code(KC_MPRV);
                 }
                 break;
 
@@ -227,6 +225,7 @@ void encoder_update_user(uint8_t index, bool clockwise) {
                 break;
         }
     }
+    return false;
 }
 #endif
 
