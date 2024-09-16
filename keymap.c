@@ -33,27 +33,28 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * Base Layer: QWERTY
  *
  * ,-------------------------------------------.                              ,-------------------------------------------.
- * |RAIS/ESC|   Q  |   W  |   E  |   R  |   T  |                              |   Y  |   U  |   I  |   O  |   P  |  | \   |
+ * |  ESC   |   Q  |   W  |   E  |   R  |   T  |                              |   Y  |   U  |   I  |   O  |   P  |  | \   |
  * |--------+------+------+------+------+------|                              |------+------+------+------+------+--------|
- * |Ctrl/BS |   A  |   S  |D/ALT | F/GUI|   G  |                              |   H  |J/GUI |K/ALT |   L  | ;  : |  ' "   |
+ * |        |   A  |   S  |D/ALT | F/GUI|   G  |                              |   H  |   J  |   K  |   L  | ;  : |  ' "   |
  * |--------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+--------|
- * | LShift |   Z  |   X  |   C  |   V  |   B  |LShift|LShift|  |LShift|LShift|   N  |   M  | ,  < | . >  | /  ? |  - _   |
+ * |        |   Z  |   X  |   C  |   V  |   B  |LwrUpt|RseLft|  |Right |Down  |N/ALT |M/GUI | ,  < | . >  | /  ? |  - _   |
  * `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
- *                        | GUI  | Del  | Enter| Space| Enter|  | Enter| Space| Tab  | Bksp | AltGr|
- *                        |      |      | Ctrl | Lower| Shift|  | Lower| Raise|      |      |      |
+ *                        |      | Del  | Enter| Space| Enter|  | Enter| Space| Tab  | Bksp |      |
+ *                        |      |      |Lower | Ctrl | Shift|  | Raise| Lower|Lower |      |      |
  *                        `----------------------------------'  `----------------------------------'
  */
 #define D_ALT MT(MOD_LALT, KC_D)
 #define F_GUI MT(MOD_LGUI, KC_F)
-#define J_GUI MT(MOD_LGUI, KC_J)
-#define K_ALT MT(MOD_LALT, KC_K)
+#define M_GUI MT(MOD_LGUI, KC_M)
+#define N_ALT MT(MOD_LALT, KC_N)
 
     [_QWERTY] = LAYOUT(
       /* LT(KC_RALT, KC_ESC) */
-      KC_MS_BTN2,              KC_Q,   KC_W,   KC_E,   KC_R,   KC_T,                                         KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_PIPE,
-      KC_LCTL,                 KC_A,   KC_S,   D_ALT,  F_GUI,  KC_G,                                         KC_H,   J_GUI,   K_ALT,    KC_L,    KC_SCLN, KC_QUOT,
-      KC_LSFT,                 KC_Z,   KC_X,   KC_C,   KC_V,   KC_B,   KC_UP,   KC_LEFT, KC_RGHT, KC_DOWN,  KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_MINS,
-     KC_LGUI, KC_DEL, MT(MOD_LCTL, KC_ENT), LT(_LOWER, KC_SPC), MT(KC_LSFT, KC_ENT), KC_MS_BTN1, LT(_RAISE, KC_SPC), LT(_LOWER, KC_TAB),  KC_BSPC, LGUI(LCTL(KC_Q))
+       KC_ESC, KC_Q,   KC_W,   KC_E,   KC_R,   KC_T,                                         KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_PIPE,
+      _______, KC_A,   KC_S,   D_ALT,  F_GUI,  KC_G,                                         KC_H,   KC_J,     KC_K,    KC_L,    KC_SCLN, KC_QUOT,
+      _______, KC_Z,   KC_X,   KC_C,   KC_V,   KC_B,   LT(_LOWER, KC_UP),   LT(_RAISE, KC_LEFT), KC_RGHT, KC_DOWN, N_ALT,  M_GUI,     KC_COMM, KC_DOT,  KC_SLSH, KC_MINS,
+      _______, KC_DEL, LT(_LOWER, KC_ENT), CTL_T(KC_SPC), SFT_T(KC_ENT),        LT(_RAISE, KC_ENT), LT(_LOWER, KC_SPC), LT(_LOWER, KC_TAB),  KC_BSPC, LGUI(LCTL(KC_Q))
+
     ),
 /*
  * Lower Layer: Symbols
