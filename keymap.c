@@ -35,20 +35,25 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * ,-------------------------------------------.                              ,-------------------------------------------.
  * |RAIS/ESC|   Q  |   W  |   E  |   R  |   T  |                              |   Y  |   U  |   I  |   O  |   P  |  | \   |
  * |--------+------+------+------+------+------|                              |------+------+------+------+------+--------|
- * |Ctrl/BS |   A  |   S  |  D   |   F  |   G  |                              |   H  |   J  |   K  |   L  | ;  : |  ' "   |
+ * |Ctrl/BS |   A  |   S  |D/ALT | F/GUI|   G  |                              |   H  |J/GUI |K/ALT |   L  | ;  : |  ' "   |
  * |--------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+--------|
  * | LShift |   Z  |   X  |   C  |   V  |   B  |LShift|LShift|  |LShift|LShift|   N  |   M  | ,  < | . >  | /  ? |  - _   |
  * `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
- *                        | GUI  | Del  | Enter| Space| Esc  |  | Enter| Space| Tab  | Bksp | AltGr|
- *                        |      |      | Alt  | Lower| Raise|  | Lower| Raise|      |      |      |
+ *                        | GUI  | Del  | Enter| Space| Enter|  | Enter| Space| Tab  | Bksp | AltGr|
+ *                        |      |      | Ctrl | Lower| Shift|  | Lower| Raise|      |      |      |
  *                        `----------------------------------'  `----------------------------------'
  */
+#define D_ALT MT(MOD_LALT, KC_D)
+#define F_GUI MT(MOD_LGUI, KC_F)
+#define J_GUI MT(MOD_LGUI, KC_J)
+#define K_ALT MT(MOD_LALT, KC_K)
+
     [_QWERTY] = LAYOUT(
       /* LT(KC_RALT, KC_ESC) */
       KC_MS_BTN2,              KC_Q,   KC_W,   KC_E,   KC_R,   KC_T,                                         KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_PIPE,
-      KC_LCTL,                 KC_A,   KC_S,   KC_D,   KC_F,   KC_G,                                         KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,
+      KC_LCTL,                 KC_A,   KC_S,   D_ALT,  F_GUI,  KC_G,                                         KC_H,   J_GUI,   K_ALT,    KC_L,    KC_SCLN, KC_QUOT,
       KC_LSFT,                 KC_Z,   KC_X,   KC_C,   KC_V,   KC_B,   KC_UP,   KC_LEFT, KC_RGHT, KC_DOWN,  KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_MINS,
-     KC_LGUI, KC_DEL, MT(MOD_LALT, KC_ENT), LT(_LOWER, KC_SPC), LT(_RAISE, KC_ESC), KC_MS_BTN1, LT(_RAISE, KC_SPC), LT(_LOWER, KC_TAB),  KC_BSPC, LGUI(LCTL(KC_Q))
+     KC_LGUI, KC_DEL, MT(MOD_LCTL, KC_ENT), LT(_LOWER, KC_SPC), MT(KC_LSFT, KC_ENT), KC_MS_BTN1, LT(_RAISE, KC_SPC), LT(_LOWER, KC_TAB),  KC_BSPC, LGUI(LCTL(KC_Q))
     ),
 /*
  * Lower Layer: Symbols
@@ -65,7 +70,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *                        `----------------------------------'  `----------------------------------'
  */
     [_LOWER] = LAYOUT(
-      _______, KC_EXLM, KC_AT,   KC_LCBR, KC_RCBR, KC_PIPE,                                    KC_INSERT, KC_PAUSE, KC_PSCREEN, _______,  _______, KC_BSLS,
+      _______, KC_EXLM, KC_AT,   KC_LCBR, KC_RCBR, KC_PIPE,                                    KC_INSERT, KC_PAUSE, KC_PSCR, _______,  _______, KC_BSLS,
       _______, KC_HASH, KC_DLR,  KC_LPRN, KC_RPRN, KC_GRV,                                     KC_PLUS, KC_MINS, KC_SLSH, KC_ASTR, KC_PERC, KC_QUOT,
       _______, KC_PERC, KC_CIRC, KC_LBRC, KC_RBRC, KC_TILD, KC_PGUP, KC_HOME, KC_END, KC_PGDN, KC_AMPR, KC_EQL,  KC_COMM, KC_DOT,  KC_SLSH, KC_MINS,
                                  _______, _______, _______, KC_SCLN, KC_EQL,  KC_EQL, KC_SCLN, _______, _______, KC_MNXT

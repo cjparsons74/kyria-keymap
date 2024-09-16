@@ -21,11 +21,22 @@
 #endif
 
 #ifdef RGBLIGHT_ENABLE
-  #define RGBLIGHT_ANIMATIONS
-  #define RGBLIGHT_HUE_STEP 8
-  #define RGBLIGHT_SAT_STEP 8
-  #define RGBLIGHT_VAL_STEP 8
-  #define RGBLIGHT_LIMIT_VAL 150
+#    define RGBLIGHT_EFFECT_BREATHING
+#    define RGBLIGHT_EFFECT_RAINBOW_MOOD
+#    define RGBLIGHT_EFFECT_RAINBOW_SWIRL
+#    define RGBLIGHT_EFFECT_SNAKE
+#    define RGBLIGHT_EFFECT_KNIGHT
+#    define RGBLIGHT_EFFECT_CHRISTMAS
+#    define RGBLIGHT_EFFECT_STATIC_GRADIENT
+#    define RGBLIGHT_EFFECT_RGB_TEST
+#    define RGBLIGHT_EFFECT_ALTERNATING
+#    define RGBLIGHT_EFFECT_TWINKLE
+#    define RGBLIGHT_HUE_STEP 8
+#    define RGBLIGHT_SAT_STEP 8
+#    define RGBLIGHT_VAL_STEP 8
+#    ifndef RGBLIGHT_LIMIT_VAL
+#    	define RGBLIGHT_LIMIT_VAL 150
+#    endif
 #endif
 
 // If you are using an Elite C rev3 on the slave side, uncomment the lines below:
@@ -36,6 +47,6 @@
 // When using the default resolution of 4, if you notice your encoder skipping
 // every other tick, lower the resolution to 2.
 #define ENCODER_RESOLUTION 2
-#define PIMORONI_TRACKBALL_CLICK 
+#define PIMORONI_TRACKBALL_CLICK
 #define MASTER_RIGHT
 #define PERMISSIVE_HOLD_PER_KEY
