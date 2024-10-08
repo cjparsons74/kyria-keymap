@@ -29,12 +29,12 @@ enum layers {
 // };
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /*
- * Base Layer: QWERTY
+ * Base Layer:
  *
  * ,-------------------------------------------.                              ,-------------------------------------------.
- * |  ESC   |   Q  |   W  |   J  |   R  |   T  |                              |   Y  |   U  |   I  |   O  |   P  |  | \   |
+ * |  ESC   |   Q  |   W  |   F  |   R  |   G  |                              |   Y  |   U  |   I  |   O  |   P  |  | \   |
  * |--------+------+------+------+------+------|                              |------+------+------+------+------+--------|
- * |        |   A  |   S  |D/ALT | F/GUI|   G  |                              |   H  |   N  |   E  |   L  | ;  : |  ' "   |
+ * |        |   A  |   S  |   D  |  T   |   J  |                              |   H  |   N  |   E  |   L  | ;  : |  ' "   |
  * |--------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+--------|
  * |        |   Z  |   X  |   C  |   V  |   B  |LwrUpt|RseLft|  |Right |Down  |K/ALT |M/GUI | ,  < | . >  | /  ? |  - _   |
  * `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
@@ -42,13 +42,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *                        |      |      |Lower | Ctrl | Shift|  | Raise| Lower|Lower |      |      |
  *                        `----------------------------------'  `----------------------------------'
  */
-#define D_ALT MT(MOD_LALT, KC_D)
-#define F_GUI MT(MOD_LGUI, KC_F)
+/* #define D_ALT MT(MOD_LALT, KC_D) */
+/* #define T_GUI MT(MOD_LGUI, KC_F) */
 
     [_QWERTY] = LAYOUT(
       /* LT(KC_RALT, KC_ESC) */
-      KC_MS_BTN2,              KC_Q,   KC_W,   KC_J,   KC_R,   KC_T,                                         KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_PIPE,
-      KC_LCTL,                 KC_A,   KC_S,   D_ALT,  F_GUI,  KC_G,                                         KC_H,    KC_N,    KC_E,    KC_L,    KC_SCLN, KC_QUOT,
+      KC_MS_BTN2,              KC_Q,   KC_W,   KC_F,   KC_R,   KC_G,                                         KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_PIPE,
+      KC_LCTL,                 KC_A,   KC_S,   KC_D,   KC_T,   KC_J,                                         KC_H,    KC_N,    KC_E,    KC_L,    KC_SCLN, KC_QUOT,
       KC_LSFT,                 KC_Z,   KC_X,   KC_C,   KC_V,   KC_B,   KC_UP,   KC_LEFT, KC_RGHT, KC_DOWN,  KC_K,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_MINS,
       KC_LGUI, KC_DEL, MT(MOD_LALT, KC_ENT), LT(_LOWER, KC_SPC), LT(_RAISE, KC_ESC), KC_MS_BTN1, LT(_RAISE, KC_SPC), LT(_LOWER, KC_TAB),  KC_BSPC, LGUI(LCTL(KC_Q))
     ),
