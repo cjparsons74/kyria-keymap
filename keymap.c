@@ -1,5 +1,6 @@
 /* Copyright 2019 Thomas Baart <thomas@splitkb.com>
  *
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
@@ -43,13 +44,22 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *                        |      |      |Lower | Ctrl | Shift|  | Raise| Lower|Lower |      |      |
  *                        `----------------------------------'  `----------------------------------'
  */
-/* #define D_ALT MT(MOD_LALT, KC_D) */
-/* #define T_GUI MT(MOD_LGUI, KC_F) */
+// Left-hand home row mods
+#define HOME_A LCTL_T(KC_A)
+#define HOME_R LALT_T(KC_R)
+#define HOME_S LGUI_T(KC_S)
+#define HOME_T LSFT_T(KC_T)
+
+// Right-hand home row mods
+#define HOME_N RSFT_T(KC_N)
+#define HOME_E RGUI_T(KC_E)
+#define HOME_I LALT_T(KC_I)
+#define HOME_O RCTL_T(KC_O)
 
     [_QWERTY] = LAYOUT(
       /* LT(KC_RALT, KC_ESC) */
       KC_MS_BTN2,              KC_Q,   KC_W,   KC_F,   KC_P,   KC_G,                                         KC_J,    KC_L,    KC_U,    KC_Y,    KC_SCLN,    KC_PIPE,
-      KC_LCTL,                 KC_A,   KC_R,   KC_S,   KC_T,   KC_D,                                         KC_H,    KC_N,    KC_E,    KC_I,    KC_O, KC_QUOT,
+      KC_LCTL,                 HOME_A,   HOME_R,   HOME_S,  HOME_T, KC_D,                                         KC_H,    HOME_N,   HOME_E,  HOME_I,    HOME_O, KC_QUOT,
       KC_LSFT,                 KC_Z,   KC_X,   KC_C,   KC_V,   KC_B,   KC_UP,   KC_LEFT, KC_RGHT, KC_DOWN,  KC_K,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_MINS,
       KC_LGUI, KC_DEL, MT(MOD_LALT, KC_ENT), LT(_LOWER, KC_SPC), LT(_RAISE, KC_ESC), KC_MS_BTN1, LT(_RAISE, KC_SPC), LT(_LOWER, KC_TAB),  KC_BSPC, LGUI(LCTL(KC_Q))
     ),
