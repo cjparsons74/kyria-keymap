@@ -16,6 +16,7 @@
  */
 #include QMK_KEYBOARD_H
 #include "drivers/sensors/pimoroni_trackball.h"
+#include "sm_td.h"
 
 enum layers {
     _QWERTY = 0,
@@ -44,24 +45,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *                        |      |      |Lower | Ctrl | Shift|  | Raise| Lower|Lower |      |      |
  *                        `----------------------------------'  `----------------------------------'
  */
-// Left-hand home row mods
-#define HOME_A LCTL_T(KC_A)
-#define HOME_R LALT_T(KC_R)
-#define HOME_S LGUI_T(KC_S)
-#define HOME_T LSFT_T(KC_T)
-
-// Right-hand home row mods
-#define HOME_N RSFT_T(KC_N)
-#define HOME_E RGUI_T(KC_E)
-#define HOME_I LALT_T(KC_I)
-#define HOME_O RCTL_T(KC_O)
 
     [_QWERTY] = LAYOUT(
-      /* LT(KC_RALT, KC_ESC) */
       KC_MS_BTN2,              KC_Q,   KC_W,   KC_F,   KC_P,   KC_G,                                         KC_J,    KC_L,    KC_U,    KC_Y,    KC_SCLN,    KC_PIPE,
-      KC_LCTL,                 HOME_A,   HOME_R,   HOME_S,  HOME_T, KC_D,                                         KC_H,    HOME_N,   HOME_E,  HOME_I,    HOME_O, KC_QUOT,
-      KC_LSFT,                 KC_Z,   KC_X,   KC_C,   KC_V,   KC_B,   KC_UP,   KC_LEFT, KC_RGHT, KC_DOWN,  KC_K,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_MINS,
-      KC_LGUI, KC_DEL, MT(MOD_LALT, KC_ENT), LT(_LOWER, KC_SPC), LT(_RAISE, KC_ESC), KC_MS_BTN1, LT(_RAISE, KC_SPC), LT(_LOWER, KC_TAB),  KC_BSPC, LGUI(LCTL(KC_Q))
+      KC_LCTL,                 KC_A,   KC_R,   KC_S,   KC_T,   KC_D,                                         KC_H,    KC_N,   KC_E,  KC_I,    KC_O, KC_QUOT,
+      KC_LSFT,                 KC_Z,   KC_X,   KC_C,   KC_V,   KC_B,    KC_UP,   KC_LEFT, KC_RGHT, KC_DOWN,  KC_K,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_MINS,
+      KC_LGUI, KC_DEL, KC_ENT, KC_SPC, KC_ESC, MO(_LOWER),                       KC_SPC, KC_TAB,  KC_BSPC, LGUI(LCTL(KC_Q))
     ),
 /*
  * Lower Layer: Symbols
@@ -244,6 +233,9 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
 #endif
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    if (!process_smtd(keycode, record)) {
+        return false;
+    }
     switch (keycode) {
         // case DND15:
         //     if (record->event.pressed) {
@@ -266,4 +258,23 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         //     break;
     }
     return true;
+}
+
+smtd_resolution on_smtd_action(uint16_t keycode, smtd_action action, uint8_t tap_count) {
+    switch (keycode) {
+        SMTD_MT(KC_A, KC_LEFT_CTRL)
+        SMTD_MT(KC_R, KC_LEFT_ALT)
+        SMTD_MT(KC_S, KC_LEFT_GUI)
+        SMTD_MT(KC_T, KC_LSFT)
+        SMTD_MT(KC_O, KC_RIGHT_CTRL)
+        SMTD_MT(KC_I, KC_LEFT_ALT)
+        SMTD_MT(KC_E, KC_LEFT_GUI)
+        SMTD_MT(KC_N, KC_LSFT)
+        SMTD_MT(KC_ENT, KC_LEFT_ALT)
+        SMTD_LT(KC_SPC, _LOWER)
+        SMTD_LT(KC_ESC, _RAISE)
+        SMTD_LT(KC_TAB, _RAISE)
+    }
+
+    return SMTD_RESOLUTION_UNHANDLED;
 }
