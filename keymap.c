@@ -25,11 +25,12 @@ enum layers {
     _ADJUST
 };
 
-// enum custom_keycodes {
-    // DND15 = SAFE_RANGE,, /* Slack "Do not disturb 25 mins" */
-    // DND30,
-    // DND60,
-// };
+static uint32_t mouse_layer_timer = 0;
+static bool mouse_layer_active = false;
+
+#define MOUSE_TIMEOUT    500   // ms
+#define MOTION_THRESHOLD 5     // px
+
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /*
  * Base Layer:
@@ -87,8 +88,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *                        `----------------------------------'  `----------------------------------'
  */
     [_RAISE] = LAYOUT(
-      _______, _______,    KC_7,    KC_8,    KC_9, KC_DEL,                                     _______,  KC_7,    KC_8,    KC_9, _______, _______,
-      _______,    KC_0,    KC_4,    KC_5,    KC_6, KC_BSPC,                                     _______,  KC_4,    KC_5,    KC_6,    KC_0, _______,
+      _______, _______,    KC_7,    KC_8,    KC_9, KC_BSPC,                                     _______,  KC_7,    KC_8,    KC_9, _______, _______,
+      _______,    KC_0,    KC_4,    KC_5,    KC_6, KC_MS_BTN1,                                  _______,  KC_MS_BTN1,    KC_MS_BTN2,    KC_6,    KC_0, _______,
       _______,    KC_0,    KC_1,    KC_2,    KC_3, KC_DOT,   KC_MS_U, KC_MS_L, KC_MS_R, KC_MS_D,_______,  KC_1,    KC_2,    KC_3,    KC_0, _______,
       _______, _______, _______, _______, _______, _______, _______, _______,  _______, KC_MPLY
       ),
@@ -195,7 +196,6 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
                     tap_code(KC_MPRV);
                 }
                 break;
-
             case _RAISE:
                 if (clockwise){
                     tap_code(KC_VOLD);
@@ -232,31 +232,49 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
 }
 #endif
 
+// --- Mouse motion handling ---
+report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
+    uint16_t motion = abs(mouse_report.x) + abs(mouse_report.y);
+
+    if (motion > MOTION_THRESHOLD) {
+        if (!mouse_layer_active) {
+            layer_on(_RAISE);
+            mouse_layer_active = true;
+        }
+        // keep extending the timer
+        mouse_layer_timer = timer_read32();
+    }
+
+    if (mouse_layer_active && timer_elapsed32(mouse_layer_timer) > MOUSE_TIMEOUT) {
+        layer_off(_RAISE);
+        mouse_layer_active = false;
+    }
+    return mouse_report;
+}
+
+// --- Mouse button handling ---
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+
     if (!process_smtd(keycode, record)) {
         return false;
     }
-    switch (keycode) {
-        // case DND15:
-        //     if (record->event.pressed) {
-        //         SEND_STRING("/dnd 15 minutes");
-        //     } else {
-        //     }
-        //     break;
-        //
-        // case DND30:
-        //     if (record->event.pressed) {
-        //         SEND_STRING("/dnd 30 minutes");
-        //     } else {
-        //     }
-        //     break;
-        // case DND60:
-        //     if (record->event.pressed) {
-        //         SEND_STRING("/dnd 60 minutes");
-        //     } else {
-        //     }
-        //     break;
-    }
+    /*switch (keycode) {*/
+    /*    case VIRTUAL_MS_BTN1:*/
+    /*        if (record->event.pressed) {*/
+    /*            register_code16(KC_MS_BTN1);   // press stays active*/
+    /*        } else {*/
+    /*            unregister_code16(KC_MS_BTN1); // release when key released*/
+    /*        }*/
+    /*        return false; // don’t let QMK handle it again*/
+    /**/
+    /*    case VIRTUAL_MS_BTN2:*/
+    /*        if (record->event.pressed) {*/
+    /*            register_code16(KC_MS_BTN2);*/
+    /*        } else {*/
+    /*            unregister_code16(KC_MS_BTN2);*/
+    /*        }*/
+    /*        return false;*/
+    /*}*/
     return true;
 }
 
