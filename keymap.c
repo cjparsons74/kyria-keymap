@@ -28,7 +28,7 @@ enum layers {
 static uint32_t mouse_layer_timer = 0;
 static bool mouse_layer_active = false;
 
-#define MOUSE_TIMEOUT    500   // ms
+#define MOUSE_TIMEOUT    1000   // ms
 #define MOTION_THRESHOLD 5     // px
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -232,9 +232,38 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
 }
 #endif
 
+// Allow direction changes up to ~120° before reset
+// (cos(60°) ≈ 0.5 → dot must be at least half of max possible alignment)
+
+#define COS_HALF_DIVISOR 2   // bigger divisor = looser tolerance (e.g. 3 ≈ 70°, 4 ≈ 75°)
+
+static inline bool should_reset(int dx, int dy, int last_dx, int last_dy) {
+    long dot = (long)dx * last_dx + (long)dy * last_dy;
+    if (dot <= 0) return true;  // >90° → always reset
+
+    // Compute rough "alignment" check without sqrt
+    long mag_a = (long)dx * dx + (long)dy * dy;
+    long mag_b = (long)last_dx * last_dx + (long)last_dy * last_dy;
+
+    // require dot^2 > (mag_a * mag_b) / COS_HALF_DIVISOR
+    // (approx: cosθ > ~0.5 → angle < ~60° from previous direction)
+    return (dot * dot) < (mag_a * mag_b) / COS_HALF_DIVISOR;
+}
+
+static uint16_t last_move_time = 0;
+static int16_t momentum = 100; // percent (100 = 1.0x)
+
+#define MOMENTUM_STEP 15       // how quickly it grows per tick
+#define MOMENTUM_DECAY 4       // how quickly it shrinks when idle
+#define MOMENTUM_MIN   80      // 0.8x scaling for precision
+#define MOMENTUM_MAX  1500      // 15.0x max speed
+
+
 // --- Mouse motion handling ---
 report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
     uint16_t motion = abs(mouse_report.x) + abs(mouse_report.y);
+    int16_t dx = mouse_report.x;
+    int16_t dy = mouse_report.y;
 
     if (motion > MOTION_THRESHOLD) {
         if (!mouse_layer_active) {
@@ -249,6 +278,34 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
         layer_off(_RAISE);
         mouse_layer_active = false;
     }
+
+
+    if (dx || dy) {
+        uint16_t now = timer_read();
+        uint16_t dt = now - last_move_time;
+        last_move_time = now;
+
+        if (dt < 50) {
+            momentum += MOMENTUM_STEP;
+            if (momentum > MOMENTUM_MAX) momentum = MOMENTUM_MAX;
+        } else {
+            momentum -= MOMENTUM_DECAY;
+            if (momentum < MOMENTUM_MIN) momentum = MOMENTUM_MIN;
+        }
+
+        mouse_report.x = (dx * momentum) / 100;
+        mouse_report.y = (dy * momentum) / 100;
+
+        uprintf("dx=%d dy=%d dt=%u momentum=%d scaled=(%d,%d)\n",
+                dx, dy, dt, momentum,
+                mouse_report.x, mouse_report.y);
+    } else {
+        if (momentum > MOMENTUM_MIN) {
+            momentum -= MOMENTUM_DECAY;
+            if (momentum < MOMENTUM_MIN) momentum = MOMENTUM_MIN;
+        }
+    }
+
     return mouse_report;
 }
 

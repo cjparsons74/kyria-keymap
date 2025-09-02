@@ -1,8 +1,17 @@
 OLED_DRIVER_ENABLE = no   # Enables the use of OLED displays
-ENCODER_ENABLE = yes       # Enables the use of one or more encoders
 RGBLIGHT_ENABLE = no      # Enable keyboard RGB underglow
 QUANTUM_LIB_SRC += i2c_master.c
-MOUSEKEY_ENABLE = yes
+ifeq ($(DEBUG), yes)
+	MOUSEKEY_ENABLE = no
+	ENCODER_ENABLE = no
+	CONSOLE_ENABLE = yes
+	EXTRAKEY_ENABLE = no
+else
+	MOUSEKEY_ENABLE = yes
+	ENCODER_ENABLE = yes
+	CONSOLE_ENABLE = no
+	EXTRAKEY_ENABLE = yes
+endif
 POINTING_DEVICE_ENABLE = yes
 POINTING_DEVICE_DRIVER = pimoroni_trackball
 SRC += drivers/sensors/pimoroni_trackball.c
