@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include QMK_KEYBOARD_H
+#include "sm_td.h"
 
 enum layers {
     _QWERTY = 0,
@@ -42,15 +43,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *                        |      |      |Lower | Ctrl | Shift|  | Raise| Lower|Lower |      |      |
  *                        `----------------------------------'  `----------------------------------'
  */
-/* #define D_ALT MT(MOD_LALT, KC_D) */
-/* #define T_GUI MT(MOD_LGUI, KC_F) */
 
     [_QWERTY] = LAYOUT(
-      /* LT(KC_RALT, KC_ESC) */
       KC_MS_BTN2,              KC_Q,   KC_W,   KC_F,   KC_P,   KC_G,                                         KC_J,    KC_L,    KC_U,    KC_Y,    KC_SCLN,    KC_PIPE,
-      KC_LCTL,                 KC_A,   KC_R,   KC_S,   KC_T,   KC_D,                                         KC_H,    KC_N,    KC_E,    KC_I,    KC_O, KC_QUOT,
-      KC_LSFT,                 KC_Z,   KC_X,   KC_C,   KC_V,   KC_B,   KC_UP,   KC_LEFT, KC_RGHT, KC_DOWN,  KC_K,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_MINS,
-      KC_LGUI, KC_DEL, MT(MOD_LALT, KC_ENT), LT(_LOWER, KC_SPC), LT(_RAISE, KC_ESC), KC_MS_BTN1, LT(_RAISE, KC_SPC), LT(_LOWER, KC_TAB),  KC_BSPC, LGUI(LCTL(KC_Q))
+      KC_LCTL,                 KC_A,   KC_R,   KC_S,   KC_T,   KC_D,                                         KC_H,    KC_N,   KC_E,  KC_I,    KC_O, KC_QUOT,
+      KC_LSFT,                 KC_Z,   KC_X,   KC_C,   KC_V,   KC_B,    KC_UP,   KC_LEFT, KC_RGHT, KC_DOWN,  KC_K,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_MINS,
+      KC_LGUI, KC_DEL, KC_ENT, KC_SPC, KC_ESC, MO(_LOWER),                       KC_SPC, KC_TAB,  KC_BSPC, LGUI(LCTL(KC_Q))
     ),
 /*
  * Lower Layer: Symbols
@@ -144,7 +142,7 @@ oled_rotation_t oled_init_user(oled_rotation_t rotation) {
 }
 
 static void render_status(void) {
-    oled_write_P(PSTR("Cparsons rev1.18\n"), false);
+    oled_write_P(PSTR("Cparsons rev1.19\n"), false);
 
     // Host Keyboard Layer Status
     oled_write_P(PSTR("Layer: "), false);
@@ -236,27 +234,52 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
 }
 #endif
 
-bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+
+smtd_resolution on_smtd_action(uint16_t keycode, smtd_action action, uint8_t tap_count) {
     switch (keycode) {
-        // case DND15:
-        //     if (record->event.pressed) {
-        //         SEND_STRING("/dnd 15 minutes");
-        //     } else {
-        //     }
-        //     break;
-        //
-        // case DND30:
-        //     if (record->event.pressed) {
-        //         SEND_STRING("/dnd 30 minutes");
-        //     } else {
-        //     }
-        //     break;
-        // case DND60:
-        //     if (record->event.pressed) {
-        //         SEND_STRING("/dnd 60 minutes");
-        //     } else {
-        //     }
-        //     break;
+        SMTD_MT(KC_A, KC_LEFT_CTRL)
+        SMTD_MT(KC_R, KC_LEFT_ALT)
+        SMTD_MT(KC_S, KC_LEFT_GUI)
+        SMTD_MT(KC_T, KC_LSFT)
+        SMTD_MT(KC_O, KC_RIGHT_CTRL)
+        SMTD_MT(KC_I, KC_LEFT_ALT)
+        SMTD_MT(KC_E, KC_LEFT_GUI)
+        SMTD_MT(KC_N, KC_LSFT)
+        SMTD_MT(KC_ENT, KC_LEFT_ALT)
+        SMTD_LT(KC_SPC, _LOWER)
+        SMTD_LT(KC_ESC, _RAISE)
+        SMTD_LT(KC_TAB, _RAISE)
+    }
+
+    return SMTD_RESOLUTION_UNHANDLED;
+}
+
+static uint16_t f13_timer = 0;
+static bool waiting_to_release = false;
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    if (!process_smtd(keycode, record)) {
+        return false;
+    }
+    switch (keycode) {
+        case KC_F13:
+            if (record->event.pressed) {
+                // Motion started
+                layer_on(_RAISE);
+                waiting_to_release = false;
+            } else {
+                // Motion stopped -> start decay timer
+                f13_timer = timer_read();
+                waiting_to_release = true;
+            }
+            return false; // suppress actual F13 keystroke
     }
     return true;
+}
+
+void matrix_scan_user(void) {
+    if (waiting_to_release && timer_elapsed(f13_timer) > 500) {
+        layer_off(_RAISE);
+        waiting_to_release = false;
+    }
 }
