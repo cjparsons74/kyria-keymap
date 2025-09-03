@@ -46,9 +46,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [_QWERTY] = LAYOUT(
       KC_MS_BTN2,              KC_Q,   KC_W,   KC_F,   KC_P,   KC_G,                                         KC_J,    KC_L,    KC_U,    KC_Y,    KC_SCLN,    KC_PIPE,
-      KC_LCTL,                 KC_A,   KC_R,   KC_S,   KC_T,   KC_D,                                         KC_H,    KC_N,   KC_E,  KC_I,    KC_O, KC_QUOT,
-      KC_LSFT,                 KC_Z,   KC_X,   KC_C,   KC_V,   KC_B,    KC_UP,   KC_LEFT, KC_RGHT, KC_DOWN,  KC_K,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_MINS,
-      KC_LGUI, KC_DEL, KC_ENT, KC_SPC, KC_ESC, MO(_LOWER),                       KC_SPC, KC_TAB,  KC_BSPC, LGUI(LCTL(KC_Q))
+      KC_MS_BTN1,              KC_A,   KC_R,   KC_S,   KC_T,   KC_D,                                         KC_H,    KC_N,   KC_E,  KC_I,    KC_O, KC_QUOT,
+      RGB_TOG,              KC_Z,   KC_X,   KC_C,   KC_V,   KC_B,    KC_UP,   KC_LEFT, KC_RGHT, KC_DOWN,  KC_K,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_MINS,
+      KC_MS_BTN1, KC_DEL, KC_ENT, KC_SPC, KC_ESC,                       MO(_RAISE), KC_SPC, KC_TAB,  KC_BSPC, LGUI(LCTL(KC_Q))
     ),
 /*
  * Lower Layer: Symbols
@@ -65,7 +65,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *                        `----------------------------------'  `----------------------------------'
  */
     [_LOWER] = LAYOUT(
-      _______, KC_EXLM, KC_AT,   KC_LCBR, KC_RCBR, KC_PIPE,                                    KC_INSERT, KC_PAUSE, KC_PSCR, _______,  _______, KC_BSLS,
+      _______, KC_EXLM, KC_AT,   KC_LCBR, KC_RCBR, KC_PIPE,                                    KC_INSERT, KC_PAUSE, KC_PSCR, RGB_TOG,  _______, KC_BSLS,
       _______, KC_HASH, KC_DLR,  KC_LPRN, KC_RPRN, KC_GRV,                                     KC_PLUS, KC_MINS, KC_SLSH, KC_ASTR, KC_PERC, KC_QUOT,
       _______, KC_PERC, KC_CIRC, KC_LBRC, KC_RBRC, KC_TILD, KC_PGUP, KC_HOME, KC_END, KC_PGDN, KC_AMPR, KC_EQL,  KC_COMM, KC_DOT,  KC_SLSH, KC_MINS,
                                  _______, _______, _______, KC_SCLN, KC_EQL,  KC_EQL, KC_SCLN, _______, _______, KC_MNXT
@@ -254,32 +254,9 @@ smtd_resolution on_smtd_action(uint16_t keycode, smtd_action action, uint8_t tap
     return SMTD_RESOLUTION_UNHANDLED;
 }
 
-static uint16_t f13_timer = 0;
-static bool waiting_to_release = false;
-
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     if (!process_smtd(keycode, record)) {
-        return false;
-    }
-    switch (keycode) {
-        case KC_F13:
-            if (record->event.pressed) {
-                // Motion started
-                layer_on(_RAISE);
-                waiting_to_release = false;
-            } else {
-                // Motion stopped -> start decay timer
-                f13_timer = timer_read();
-                waiting_to_release = true;
-            }
-            return false; // suppress actual F13 keystroke
+         return false;
     }
     return true;
-}
-
-void matrix_scan_user(void) {
-    if (waiting_to_release && timer_elapsed(f13_timer) > 500) {
-        layer_off(_RAISE);
-        waiting_to_release = false;
-    }
 }
