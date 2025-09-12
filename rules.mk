@@ -1,5 +1,6 @@
 OLED_DRIVER_ENABLE = no   # Enables the use of OLED displays
 RGBLIGHT_ENABLE = no      # Enable keyboard RGB underglow
+CAPS_WORD_ENABLE = yes
 QUANTUM_LIB_SRC += i2c_master.c
 ifeq ($(DEBUG), yes)
 	MOUSEKEY_ENABLE = no

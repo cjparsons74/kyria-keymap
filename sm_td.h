@@ -45,7 +45,7 @@
 
 // https://www.reddit.com/r/ErgoMechKeyboards/comments/1f18d8h/comment/moeud1a/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
 #define SMTD_GLOBAL_TAP_TERM 200
-#define SMTD_GLOBAL_RELEASE_TERM 30
+#define SMTD_GLOBAL_RELEASE_TERM 23
 #define SMTD_GLOBAL_FOLLOWING_TAP_TERM 400
 #define SMTD_GLOBAL_SEQUENCE_TERM 300
 
