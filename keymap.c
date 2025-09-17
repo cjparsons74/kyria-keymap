@@ -24,18 +24,19 @@ enum layers {
     _ADJUST
 };
 
-// enum custom_keycodes {
-    // DND15 = SAFE_RANGE,, /* Slack "Do not disturb 25 mins" */
-    // DND30,
-    // DND60,
-// };
+enum custom_keycodes {
+    L_LOWER = SAFE_RANGE,
+    L_RAISE,
+    R_RAISE,
+    R_LOWER,
+};
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [_QWERTY] = LAYOUT(
-      MS_BTN2, KC_Q,   KC_W,   KC_F,   KC_P,   KC_G,                                         KC_J,    KC_L,    KC_U,    KC_Y,    KC_SCLN,    KC_PIPE,
-      MS_BTN1, KC_A,   KC_R,   KC_S,   KC_T,   KC_D,                                         KC_H,    KC_N,   KC_E,  KC_I,    KC_O, KC_QUOT,
-      MS_BTN1, KC_Z,   KC_X,   KC_C,   KC_V,   KC_B,    KC_UP,   KC_LEFT, KC_RGHT, LGUI(LCTL(KC_Q)), KC_K,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_MINS,
-      QK_CAPS_WORD_TOGGLE, KC_DEL, KC_ENT, LT(_LOWER, KC_SPC), LT(_RAISE, KC_ESC),                       MO(_RAISE), LT(_LOWER, KC_SPC), KC_TAB,  KC_BSPC, KC_DOWN
+      MS_BTN2, KC_Q,   KC_W,   KC_F,   KC_P,   KC_G,                                          KC_J,    KC_L,    KC_U,    KC_Y,    KC_SCLN,    KC_PIPE,
+      MS_BTN1, KC_A,   KC_R,   KC_S,   KC_T,   KC_D,                                          KC_H,    KC_N,   KC_E,  KC_I,    KC_O, KC_QUOT,
+      MS_BTN1, KC_Z,   KC_X,   KC_C,   KC_V,   KC_B,    KC_UP ,   KC_LEFT, KC_RGHT, LGUI(LCTL(KC_Q)), KC_K,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_MINS,
+      QK_CAPS_WORD_TOGGLE, KC_DEL, KC_ENT,  L_LOWER, L_RAISE,                                 R_LOWER, R_RAISE, KC_TAB, KC_BSPC, KC_DOWN
     ),
 
     [_LOWER] = LAYOUT(
@@ -113,9 +114,9 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
                 // uprintf("QWERTY\n");
                 // Page up/Page down
                 if (clockwise) {
-                   tap_code(KC_PGDN);
+                   tap_code(QK_MOUSE_WHEEL_DOWN);
                 } else {
-                   tap_code(KC_PGUP);
+                   tap_code(QK_MOUSE_WHEEL_UP);
                 }
                 break;
         }
@@ -135,7 +136,10 @@ smtd_resolution on_smtd_action(uint16_t keycode, smtd_action action, uint8_t tap
         SMTD_MT(KC_I, KC_LEFT_ALT)
         SMTD_MT(KC_E, KC_LEFT_GUI)
         SMTD_MT(KC_N, KC_LSFT)
-        SMTD_MT(KC_ENT, KC_LEFT_ALT)
+        SMTD_LT_ON_MKEY(L_LOWER, KC_SPC, _LOWER)
+        SMTD_LT_ON_MKEY(L_RAISE, KC_ESC, _RAISE)
+        SMTD_LT_ON_MKEY(R_LOWER, QK_CAPS_WORD_TOGGLE, _LOWER)
+        SMTD_LT_ON_MKEY(R_RAISE, KC_SPC, _RAISE)
     }
 
     return SMTD_RESOLUTION_UNHANDLED;
