@@ -31,20 +31,26 @@ static bool mouse_layer_active = false;
 #define MOUSE_TIMEOUT    1000   // ms
 #define MOTION_THRESHOLD 5     // px
 
+enum custom_keycodes {
+    L_LOWER = SAFE_RANGE,
+    L_RAISE,
+    R_RAISE,
+    R_LOWER,
+};
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [_QWERTY] = LAYOUT(
-      MS_BTN2, KC_Q,   KC_W,   KC_F,   KC_P,   KC_G,                                         KC_J,    KC_L,    KC_U,    KC_Y,    KC_SCLN,    KC_PIPE,
-      MS_BTN1, KC_A,   KC_R,   KC_S,   KC_T,   KC_D,                                         KC_H,    KC_N,   KC_E,  KC_I,    KC_O, KC_QUOT,
-      MS_BTN1, KC_Z,   KC_X,   KC_C,   KC_V,   KC_B,    KC_UP,   KC_LEFT, KC_RGHT, KC_DOWN, KC_K,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_MINS,
-      _______, KC_DEL, KC_ENT, LT(_LOWER, KC_SPC),  LT(_RAISE, KC_ESC),                       MO(_RAISE), LT(_LOWER, KC_SPC), KC_TAB,  KC_BSPC, LGUI(LCTL(KC_Q))
+      MS_BTN2, KC_Q,   KC_W,   KC_F,   KC_P,   KC_G,                                          KC_J,    KC_L,    KC_U,    KC_Y,    KC_SCLN,    KC_PIPE,
+      MS_BTN1, KC_A,   KC_R,   KC_S,   KC_T,   KC_D,                                          KC_H,    KC_N,   KC_E,  KC_I,    KC_O, KC_QUOT,
+      MS_BTN1, KC_Z,   KC_X,   KC_C,   KC_V,   KC_B,    KC_UP ,   KC_LEFT, KC_RGHT, KC_DOWN,  KC_K,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_MINS,
+      QK_CAPS_WORD_TOGGLE, KC_DEL, KC_ENT,  L_LOWER, L_RAISE,                                 R_LOWER, R_RAISE, KC_TAB, KC_BSPC, LGUI(LCTL(KC_Q))
     ),
 
     [_LOWER] = LAYOUT(
       _______, KC_EXLM, KC_AT,   KC_LCBR, KC_RCBR, KC_PIPE,                                    KC_INSERT, KC_PAUSE, KC_PSCR, _______,  _______, KC_BSLS,
       _______, KC_HASH, KC_DLR,  KC_LPRN, KC_RPRN, KC_GRV,                                     KC_PLUS, KC_MINS, KC_SLSH, KC_ASTR, KC_PERC, KC_QUOT,
-      _______, KC_PERC, KC_CIRC, KC_LBRC, KC_RBRC, KC_TILD, KC_PGUP, KC_HOME, KC_END, KC_PGDN, KC_AMPR, KC_EQL,  KC_COMM, KC_DOT,  KC_SLSH, KC_MINS,
-                                 _______, _______, _______, KC_SCLN, KC_EQL,  KC_EQL, KC_SCLN, _______, _______, KC_MNXT
+      _______, KC_PERC, KC_CIRC, KC_LBRC, KC_RBRC, KC_TILD, KC_PGUP, KC_HOME, KC_END, KC_MNXT, KC_AMPR, KC_EQL,  KC_COMM, KC_DOT,  KC_SLSH, KC_MINS,
+                                 _______, _______, _______, KC_SCLN, KC_EQL,  KC_EQL, KC_SCLN, _______, _______, KC_PGDN
     ),
     [_RAISE] = LAYOUT(
       _______, _______,    KC_7,    KC_8,    KC_9, KC_BSPC,                                     _______,  KC_7,    KC_8,    KC_9, _______, _______,
@@ -102,9 +108,9 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
               default:
                 // Page up/Page down
                 if (clockwise) {
-                   tap_code(KC_PGUP);
+                   tap_code(QK_MOUSE_WHEEL_UP);
                 } else {
-                   tap_code(KC_PGDN);
+                   tap_code(QK_MOUSE_WHEEL_DOWN);
                 }
                 break;
         }
@@ -200,6 +206,10 @@ smtd_resolution on_smtd_action(uint16_t keycode, smtd_action action, uint8_t tap
         SMTD_MT(KC_I, KC_LEFT_ALT)
         SMTD_MT(KC_E, KC_LEFT_GUI)
         SMTD_MT(KC_N, KC_LSFT)
+        SMTD_LT_ON_MKEY(L_LOWER, KC_SPC, _LOWER)
+        SMTD_LT_ON_MKEY(L_RAISE, KC_ESC, _RAISE)
+        SMTD_LT_ON_MKEY(R_LOWER, QK_CAPS_WORD_TOGGLE, _LOWER)
+        SMTD_LT_ON_MKEY(R_RAISE, KC_SPC, _RAISE)
     }
 
     return SMTD_RESOLUTION_UNHANDLED;
