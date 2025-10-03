@@ -16,7 +16,6 @@
  */
 #include QMK_KEYBOARD_H
 #include "drivers/sensors/pimoroni_trackball.h"
-#include "sm_td.h"
 
 enum layers {
     _QWERTY = 0,
@@ -30,20 +29,32 @@ static bool mouse_layer_active = false;
 
 #define MOUSE_TIMEOUT    1000   // ms
 #define MOTION_THRESHOLD 5     // px
+// Left-hand home row mods
+#define HOME_A LCTL_T(KC_A)
+#define HOME_R LALT_T(KC_R)
+#define HOME_S LGUI_T(KC_S)
+#define HOME_T LSFT_T(KC_T)
 
-enum custom_keycodes {
-    L_LOWER = SAFE_RANGE,
-    L_RAISE,
-    R_RAISE,
-    R_LOWER,
-};
+// Right-hand home row mods
+#define HOME_N RSFT_T(KC_N)
+#define HOME_E RGUI_T(KC_E)
+#define HOME_I LALT_T(KC_I)
+#define HOME_O RCTL_T(KC_O)
+
+const char chordal_hold_layout[MATRIX_ROWS][MATRIX_COLS] PROGMEM =
+    LAYOUT(
+        'L', 'L', 'L', 'L', 'L', 'L',                      'R', 'R', 'R', 'R', 'R', 'R',
+        'L', 'L', 'L', 'L', 'L', 'L',                      'R', 'R', 'R', 'R', 'R', 'R',
+        'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R',
+                       'L', 'L', 'L', 'L', 'L', 'R', 'R', 'R', 'R', '*'
+    );
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [_QWERTY] = LAYOUT(
       MS_BTN2, KC_Q,   KC_W,   KC_F,   KC_P,   KC_G,                                          KC_J,    KC_L,    KC_U,    KC_Y,    KC_SCLN,    KC_PIPE,
-      MS_BTN1, KC_A,   KC_R,   KC_S,   KC_T,   KC_D,                                          KC_H,    KC_N,   KC_E,  KC_I,    KC_O, KC_QUOT,
-      MS_BTN1, KC_Z,   KC_X,   KC_C,   KC_V,   KC_B,    KC_UP ,   KC_LEFT, KC_RGHT, KC_DOWN,  KC_K,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_MINS,
-      QK_CAPS_WORD_TOGGLE, KC_DEL, KC_ENT,  L_LOWER, L_RAISE,                                 R_LOWER, R_RAISE, KC_TAB, KC_BSPC, LGUI(LCTL(KC_Q))
+      MS_BTN1, HOME_A,   HOME_R,   HOME_S,  HOME_T, KC_D,                    KC_H,    HOME_N,   HOME_E,  HOME_I,    HOME_O, KC_QUOT,
+      QK_CAPS_WORD_TOGGLE, KC_Z,   KC_X,   KC_C,   KC_V,   KC_B,    KC_UP ,   KC_LEFT, KC_RGHT, KC_DOWN,  KC_K,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_MINS,
+      QK_CAPS_WORD_TOGGLE, KC_DEL, KC_ENT,  LT(_LOWER, KC_SPC), LT(_RAISE, KC_ESC),           LT(_RAISE, KC_ESC), LT(_LOWER, KC_SPC), KC_TAB, KC_BSPC, LGUI(LCTL(KC_Q))
     ),
 
     [_LOWER] = LAYOUT(
@@ -196,28 +207,3 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
     return mouse_report;
 }
 
-smtd_resolution on_smtd_action(uint16_t keycode, smtd_action action, uint8_t tap_count) {
-    switch (keycode) {
-        SMTD_MT(KC_A, KC_LEFT_CTRL)
-        SMTD_MT(KC_R, KC_LEFT_ALT)
-        SMTD_MT(KC_S, KC_LEFT_GUI)
-        SMTD_MT(KC_T, KC_LSFT)
-        SMTD_MT(KC_O, KC_RIGHT_CTRL)
-        SMTD_MT(KC_I, KC_LEFT_ALT)
-        SMTD_MT(KC_E, KC_LEFT_GUI)
-        SMTD_MT(KC_N, KC_LSFT)
-        SMTD_LT_ON_MKEY(L_LOWER, KC_SPC, _LOWER)
-        SMTD_LT_ON_MKEY(L_RAISE, KC_ESC, _RAISE)
-        SMTD_LT_ON_MKEY(R_LOWER, QK_CAPS_WORD_TOGGLE, _LOWER)
-        SMTD_LT_ON_MKEY(R_RAISE, KC_SPC, _RAISE)
-    }
-
-    return SMTD_RESOLUTION_UNHANDLED;
-}
-
-bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    if (!process_smtd(keycode, record)) {
-         return false;
-    }
-    return true;
-}

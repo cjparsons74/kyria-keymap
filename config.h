@@ -49,13 +49,11 @@
 #define ENCODER_RESOLUTION 2
 #define PIMORONI_TRACKBALL_CLICK
 #define MASTER_RIGHT
-#define PERMISSIVE_HOLD_PER_KEY
-//
+
 // Configure the global tapping term (default: 200ms)
-#define TAPPING_TERM 200
+#define TAPPING_TERM 300
+#define CHORDAL_HOLD
 
 // Enable rapid switch from tap to hold, disables double tap hold auto-repeat.
-#define QUICK_TAP_TERM 0
+/*#define QUICK_TAP_TERM 0*/
 
-// Related to https://github.com/stasmarkin/sm_td
-#define MAX_DEFERRED_EXECUTORS 10
