@@ -38,8 +38,8 @@
 #    	define RGBLIGHT_LIMIT_VAL 150
 #    endif
 #endif
-
 #define MOUSEKEY_WHEEL_DELTA 5
+
 // If you are using an Elite C rev3 on the slave side, uncomment the lines below:
 // #define SPLIT_USB_DETECT
 // #define NO_USB_STARTUP_CHECK
@@ -48,12 +48,13 @@
 // When using the default resolution of 4, if you notice your encoder skipping
 // every other tick, lower the resolution to 2.
 #define ENCODER_RESOLUTION 2
-#define PERMISSIVE_HOLD_PER_KEY
+#ifdef TRACKBALL_VERSION
+#define PIMORONI_TRACKBALL_CLICK
+#define MASTER_RIGHT
+#endif
+
 // Configure the global tapping term (default: 200ms)
-#define TAPPING_TERM 200
+#define TAPPING_TERM 300
+#define CHORDAL_HOLD
 
-// Enable rapid switch from tap to hold, disables double tap hold auto-repeat.
-#define QUICK_TAP_TERM 0
 
-// Related to https://github.com/stasmarkin/sm_td
-#define MAX_DEFERRED_EXECUTORS 10

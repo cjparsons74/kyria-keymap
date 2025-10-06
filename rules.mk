@@ -1,8 +1,15 @@
+# qmk flash -kb splitkb/kyria/rev1 -km cjparsons74 -e TRACKBALL_VERSION=yes
 OLED_DRIVER_ENABLE = no   # Enables the use of OLED displays
 OLED_ENABLE = no
 CAPS_WORD_ENABLE = yes
-ENCODER_ENABLE = yes       # Enables the use of one or more encoders
+QUANTUM_LIB_SRC += i2c_master.c
 MOUSEKEY_ENABLE = yes
+ENCODER_ENABLE = yes
 EXTRAKEY_ENABLE = no
-DEFERRED_EXEC_ENABLE = yes
-# CONSOLE_ENABLE = yes       # Disable console (saves ~400 bytes)
+# Check for trackball variant
+ifeq ($(strip $(TRACKBALL_VERSION)), yes)
+    POINTING_DEVICE_ENABLE = yes
+	POINTING_DEVICE_DRIVER = pimoroni_trackball
+	SRC += drivers/sensors/pimoroni_trackball.c
+	OPT_DEFS += -DTRACKBALL_VERSION
+endif
