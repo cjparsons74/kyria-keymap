@@ -5,7 +5,7 @@ CAPS_WORD_ENABLE = yes
 QUANTUM_LIB_SRC += i2c_master.c
 MOUSEKEY_ENABLE = yes
 ENCODER_ENABLE = yes
-EXTRAKEY_ENABLE = no
+EXTRAKEY_ENABLE = yes
 # Check for trackball variant
 ifeq ($(strip $(TRACKBALL_VERSION)), yes)
     POINTING_DEVICE_ENABLE = yes
