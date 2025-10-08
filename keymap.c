@@ -155,7 +155,6 @@ static int16_t momentum = 100; // percent (100 = 1.0x)
 
 // --- Mouse motion handling ---
 report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
-    uint16_t motion = abs(mouse_report.x) + abs(mouse_report.y);
     int16_t dx = mouse_report.x;
     int16_t dy = mouse_report.y;
 
