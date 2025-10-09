@@ -25,8 +25,9 @@ enum layers {
     _ADJUST
 };
 
-static uint32_t mouse_layer_timer = 0;
-static bool mouse_layer_active = false;
+enum custom_keycodes {
+    KC_COMP_T = SAFE_RANGE,
+};
 
 #define MOUSE_TIMEOUT    1000   // ms
 #define MOTION_THRESHOLD 5     // px
@@ -54,8 +55,20 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_QWERTY] = LAYOUT(
       MS_BTN2, KC_Q,   KC_W,   KC_F,   KC_P,   KC_G,                                          KC_J,    KC_L,    KC_U,    KC_Y,    KC_SCLN,    KC_PIPE,
       MS_BTN1, HOME_A,   HOME_R,   HOME_S,  HOME_T, KC_D,                    KC_H,    HOME_N,   HOME_E,  HOME_I,    HOME_O, KC_QUOT,
-      QK_CAPS_WORD_TOGGLE, KC_Z,   KC_X,   KC_C,   KC_V,   KC_B,    KC_UP ,   KC_LEFT, KC_RGHT, KC_DOWN,  KC_K,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_MINS,
-      QK_CAPS_WORD_TOGGLE, KC_DEL, KC_ENT,  LT(_LOWER, KC_SPC), LT(_RAISE, KC_ESC),           LT(_RAISE, KC_ESC), LT(_LOWER, KC_SPC), KC_TAB, KC_BSPC, LGUI(LCTL(KC_Q))
+      QK_CAPS_WORD_TOGGLE, KC_Z,   KC_X,   KC_C,   KC_V,   KC_B,    KC_UP ,   KC_LEFT,
+        KC_RGHT,
+#ifdef TRACKBALL_VERSION
+        KC_DOWN,
+#else
+        LGUI(LCTL(KC_Q)),
+#endif
+        KC_K,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_MINS,
+      QK_CAPS_WORD_TOGGLE, KC_DEL, KC_ENT,  LT(_LOWER, KC_SPC), LT(_RAISE, KC_ESC),           LT(_RAISE, QK_CAPS_WORD_TOGGLE), LT(_LOWER, KC_SPC), KC_TAB, KC_BSPC,
+#ifdef TRACKBALL_VERSION
+            LGUI(LCTL(KC_Q))
+#else
+            KC_DOWN
+#endif
     ),
 
     [_LOWER] = LAYOUT(
@@ -65,13 +78,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                  _______, _______, _______, KC_SCLN, KC_EQL,  KC_EQL, KC_SCLN, _______, _______, KC_PGDN
     ),
     [_RAISE] = LAYOUT(
-      _______, _______,    KC_7,    KC_8,    KC_9, KC_BSPC,                                     _______,  KC_7,    KC_8,    KC_9, _______, _______,
+      KC_COMP_T,_______,    KC_7,    KC_8,    KC_9, KC_BSPC,                                     _______,  KC_7,    KC_8,    KC_9, _______, _______,
       _______,    KC_0,    KC_4,    KC_5,    KC_6, _______,                                  _______,  _______,    _______,    KC_6,    KC_0, _______,
       _______,    KC_0,    KC_1,    KC_2,    KC_3, KC_DOT,   _______, _______, _______, _______,_______,  KC_1,    KC_2,    KC_3,    KC_0, _______,
       _______, _______, _______, _______, _______, _______, _______, _______,  _______, KC_MPLY
       ),
     [_ADJUST] = LAYOUT(
-            _______, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                                       KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  _______,
+      KC_COMP_T,KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                                       KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  _______,
       _______, _______, _______, _______, _______, _______,                                     _______, _______, _______, KC_F11,  KC_F12,  _______,
       _______, _______, _______, _______, _______, _______,_______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
                                  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
@@ -80,6 +93,19 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 layer_state_t layer_state_set_user(layer_state_t state) {
     return update_tri_layer_state(state, _LOWER, _RAISE, _ADJUST);
+}
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case KC_COMP_T:  // Or whatever custom keycode you want
+            if (record->event.pressed) {
+                // Sends compile date and time
+                SEND_STRING(__DATE__ " " __TIME__);
+            }
+            return false;
+
+    }
+    return true;
 }
 
 #ifdef ENCODER_ENABLE
@@ -131,24 +157,6 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
 }
 #endif
 
-// Allow direction changes up to ~120° before reset
-// (cos(60°) ≈ 0.5 → dot must be at least half of max possible alignment)
-
-#define COS_HALF_DIVISOR 2   // bigger divisor = looser tolerance (e.g. 3 ≈ 70°, 4 ≈ 75°)
-
-static inline bool should_reset(int dx, int dy, int last_dx, int last_dy) {
-    long dot = (long)dx * last_dx + (long)dy * last_dy;
-    if (dot <= 0) return true;  // >90° → always reset
-
-    // Compute rough "alignment" check without sqrt
-    long mag_a = (long)dx * dx + (long)dy * dy;
-    long mag_b = (long)last_dx * last_dx + (long)last_dy * last_dy;
-
-    // require dot^2 > (mag_a * mag_b) / COS_HALF_DIVISOR
-    // (approx: cosθ > ~0.5 → angle < ~60° from previous direction)
-    return (dot * dot) < (mag_a * mag_b) / COS_HALF_DIVISOR;
-}
-
 static uint16_t last_move_time = 0;
 static int16_t momentum = 100; // percent (100 = 1.0x)
 
@@ -160,24 +168,8 @@ static int16_t momentum = 100; // percent (100 = 1.0x)
 
 // --- Mouse motion handling ---
 report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
-    uint16_t motion = abs(mouse_report.x) + abs(mouse_report.y);
     int16_t dx = mouse_report.x;
     int16_t dy = mouse_report.y;
-
-    if (motion > MOTION_THRESHOLD) {
-        if (!mouse_layer_active) {
-            layer_on(_RAISE);
-            mouse_layer_active = true;
-        }
-        // keep extending the timer
-        mouse_layer_timer = timer_read32();
-    }
-
-    if (mouse_layer_active && timer_elapsed32(mouse_layer_timer) > MOUSE_TIMEOUT) {
-        layer_off(_RAISE);
-        mouse_layer_active = false;
-    }
-
 
     if (dx || dy) {
         uint16_t now = timer_read();
@@ -207,3 +199,4 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
 
     return mouse_report;
 }
+
