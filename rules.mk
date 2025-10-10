@@ -14,4 +14,6 @@ ifeq ($(strip $(TRACKBALL_VERSION)), yes)
 	POINTING_DEVICE_DRIVER = pimoroni_trackball
 	SRC += drivers/sensors/pimoroni_trackball.c
 	OPT_DEFS += -DTRACKBALL_VERSION
+else
+	RGB_MATRIX_ENABLE = yes
 endif

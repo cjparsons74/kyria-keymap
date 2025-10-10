@@ -78,8 +78,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                  _______, _______, _______, KC_SCLN, KC_EQL,  KC_EQL, KC_SCLN, _______, _______, KC_PGDN
     ),
     [_RAISE] = LAYOUT(
-      KC_COMP_T,_______,    KC_7,    KC_8,    KC_9, KC_BSPC,                                     _______,  KC_7,    KC_8,    KC_9, _______, _______,
-      _______,    KC_0,    KC_4,    KC_5,    KC_6, _______,                                  _______,  _______,    _______,    KC_6,    KC_0, _______,
+      KC_COMP_T, _______,  KC_7,    KC_8,    KC_9, KC_DEL,                                    RM_TOGG, RM_SPDU, RM_SATU, RM_HUEU, RM_VALU, RM_NEXT,
+      _______,    KC_0,    KC_4,    KC_5,    KC_6, KC_BSPC,                                     _______, RM_SPDD, RM_SATD, RM_HUED, RM_VALD, RM_PREV,
       _______,    KC_0,    KC_1,    KC_2,    KC_3, KC_DOT,   _______, _______, _______, _______,_______,  KC_1,    KC_2,    KC_3,    KC_0, _______,
       _______, _______, _______, _______, _______, _______, _______, _______,  _______, KC_MPLY
       ),
@@ -112,6 +112,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 bool encoder_update_user(uint8_t index, bool clockwise) {
     // uprintf("index %d, clockwise %d\n", index, clockwise);
 
+#ifndef TRACKBALL_VERSION
+    clockwise = !clockwise;
+#endif
     if (index == 1) {
         switch(biton32(layer_state)){
             case _ADJUST:
